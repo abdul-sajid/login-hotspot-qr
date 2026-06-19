@@ -53,12 +53,12 @@
             text-decoration: none;
             display: inline-block;
             margin: 12px 0;
-            font-size: 14px;
+            font-size: 15px;
         }
         #reader a:hover { text-decoration: underline; }
 
         /* Merapikan status teks */
-        .status { margin-top: 15px; font-weight: bold; color: #444; font-size: 15px; }
+        .status { margin-top: 20px; font-weight: bold; color: #444; font-size: 15px; }
 
         /* Desain Kotak Informasi Penggunaan di bagian bawah */
         .info { 
@@ -134,8 +134,6 @@
         );
         
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-        
-        document.getElementById('status').innerText = "Kamera Siap. Silakan Klik 'Mulai Kamera'.";
     } catch (e) {
         document.getElementById('status').innerText = "Gagal memuat kamera: " + e.message;
         document.getElementById('status').style.color = "red";
@@ -156,40 +154,56 @@
                 button.style.backgroundColor = "#007bff";
             } else if (text === "Stop Scanning") {
                 button.innerText = "Hentikan Kamera ❌";
-                button.style.backgroundColor = "#dc3545"; // Mengubah warna tombol stop menjadi merah gres
+                button.style.backgroundColor = "#dc3545"; 
             } else if (text === "Choose Image" || text === "Choose File") {
                 button.innerText = "Pilih Gambar Voucher 🖼️";
-                button.style.backgroundColor = "#28a745"; // Mengubah warna tombol file menjadi hijau gres
+                button.style.backgroundColor = "#28a745"; 
             }
         });
 
-        // 2. Terjemahkan teks tautan penukar metode (Kamera <=> File Gambar)
-        const swapLinks = document.querySelectorAll("#reader a");
-        swapLinks.forEach(link => {
+        // 2. Perbaikan Terjemahan Tautan Tukar Metode (Mencari semua elemen text link)
+        const allLinks = document.querySelectorAll("#reader a, #reader span");
+        allLinks.forEach(link => {
             let text = link.innerText.trim();
-            if (text.includes("Scan an Image File")) {
+            if (text.toLowerCase().includes("scan an image file")) {
                 link.innerText = "📂 Scan Lewat File Gambar/Foto";
-            } else if (text.includes("Scan using chip camera directly")) {
+            } else if (text.toLowerCase().includes("scan using chip camera directly")) {
                 link.innerText = "📷 Gunakan Kamera Secara Langsung";
             }
         });
 
-        // 3. Terjemahkan teks label info status bawaan library di dalam kontainer
+        // 3. Mengontrol Teks Status Utama Sesuai Kondisi Antarmuka Kamera
+        const statusEl = document.getElementById('status');
+        const startButton = Array.from(buttons).find(b => b.innerText.includes("Mulai Kamera"));
+        const stopButton = Array.from(buttons).find(b => b.innerText.includes("Hentikan Kamera"));
+        const requestButton = Array.from(buttons).find(b => b.innerText.includes("Izinkan Akses Kamera"));
+
+        if (requestButton) {
+            statusEl.innerText = "Silakan klik 'Izinkan Akses Kamera' untuk memulai.";
+            statusEl.style.color = "#444";
+        } else if (startButton) {
+            statusEl.innerText = "Kamera Siap. Silakan klik 'Mulai Kamera'.";
+            statusEl.style.color = "#444";
+        } else if (stopButton) {
+            statusEl.innerText = "Kamera Aktif! Tempatkan QR Code di dalam kotak.";
+            statusEl.style.color = "#007bff";
+        }
+
+        // 4. Terjemahan error bawaan
         const containerTexts = document.querySelectorAll("#reader div");
         containerTexts.forEach(div => {
             if (div.innerText.includes("Permission denied")) {
                 div.innerText = "Akses kamera ditolak. Silakan izinkan melalui pengaturan browser Anda.";
                 div.style.color = "red";
-            } else if (div.innerText.includes("Choice Error")) {
-                div.innerText = "Gagal memuat file gambar, pastikan formatnya benar.";
-                div.style.color = "red";
+                statusEl.innerText = "Akses Kamera Ditolak.";
+                statusEl.style.color = "red";
             }
         });
     };
 
-    // Jalankan pengecekan teks UI setiap 300 milidetik agar langsung responsif saat metode ditukar
-    setInterval(translateHotspotUI, 300);
+    // Jalankan pengecekan teks UI setiap 200 milidetik agar lebih responsif
+    setInterval(translateHotspotUI, 200);
 </script>
 
-</body>
+</head>
 </html>
