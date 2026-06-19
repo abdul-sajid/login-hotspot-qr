@@ -1,39 +1,82 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner Hotspot</title>
-    
+
     <script src="html5-qrcode.min.js" type="text/javascript"></script>
-    
+
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f6f9; padding: 15px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 25px 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        h2 { color: #222; margin-top: 0; font-size: 22px; }
-        .desc { color: #666; font-size: 14px; margin-bottom: 20px; line-height: 1.4; }
-        
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background: #f4f6f9;
+            padding: 15px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 25px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            color: #222;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .desc {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
         /* Merapikan area kotak pemindai kamera */
-        #reader { width: 100% !important; border: none !important; border-radius: 12px; overflow: hidden; background: #fafafa; }
-        #reader video { width: 100% !important; border-radius: 12px; object-fit: cover; }
-        
+        #reader {
+            width: 100% !important;
+            border: none !important;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fafafa;
+        }
+
+        #reader video {
+            width: 100% !important;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
         /* Mempercantik tombol bawaan library */
-        #reader button { 
-            background-color: #007bff !important; 
-            color: white !important; 
-            border: none !important; 
-            padding: 12px 24px !important; 
-            font-size: 15px !important; 
-            font-weight: bold !important; 
-            border-radius: 8px !important; 
+        #reader button {
+            background-color: #007bff !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px 24px !important;
+            font-size: 15px !important;
+            font-weight: bold !important;
+            border-radius: 8px !important;
             cursor: pointer !important;
             margin: 8px 0 !important;
-            box-shadow: 0 3px 6px rgba(0,123,255,0.2);
+            box-shadow: 0 3px 6px rgba(0, 123, 255, 0.2);
             transition: background 0.2s, transform 0.1s;
         }
-        #reader button:hover { background-color: #0056b3 !important; }
-        #reader button:active { transform: scale(0.98); }
-        
+
+        #reader button:hover {
+            background-color: #0056b3 !important;
+        }
+
+        #reader button:active {
+            transform: scale(0.98);
+        }
+
         /* Merapikan dropdown pilihan kamera dan link tukar metode file */
         #reader select {
             padding: 10px 14px;
@@ -45,9 +88,10 @@
             width: 90%;
             max-width: 320px;
         }
-        
+
         /* Menghias tautan teks ganti metode (kamera <=> file) */
-        #reader a, #reader__dashboard_section_swaplink {
+        #reader a,
+        #reader__dashboard_section_swaplink {
             color: #007bff !important;
             font-weight: bold;
             text-decoration: none;
@@ -55,188 +99,206 @@
             margin: 12px 0;
             font-size: 15px;
         }
-        #reader a:hover { text-decoration: underline; }
+
+        #reader a:hover {
+            text-decoration: underline;
+        }
 
         /* Merapikan status teks */
-        .status { margin-top: 20px; font-weight: bold; color: #444; font-size: 15px; }
+        .status {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #444;
+            font-size: 15px;
+        }
 
         /* Desain Kotak Informasi Penggunaan di bagian bawah */
-        .info { 
-            margin-top: 25px; 
-            background: #f8f9fa; 
-            border-left: 4px solid #007bff; 
-            padding: 15px; 
-            border-radius: 8px; 
-            text-align: left; 
+        .info {
+            margin-top: 25px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
         }
-        .info p { 
-            color: #555; 
-            font-size: 13px; 
-            margin: 6px 0; 
+
+        .info p {
+            color: #555;
+            font-size: 13px;
+            margin: 6px 0;
             line-height: 1.4;
             display: flex;
             align-items: center;
         }
+
         .info p::before {
             content: "•";
             color: #007bff;
             font-weight: bold;
-            display: inline-block; 
+            display: inline-block;
             width: 15px;
             font-size: 16px;
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h2>Pindai Voucher Wi-Fi</h2>
-    <p class="desc">Pilih kamera belakang Anda, klik tombol mulai, lalu arahkan ke QR Code voucher</p>
-    
-    <!-- Kotak Scanner Kamera / Pilih File -->
-    <div id="reader"></div>
-    
-    <div id="status" class="status">Menghubungkan ke Kamera...</div>
+    <div class="container">
+        <h2>Pindai Voucher Wi-Fi</h2>
+        <p class="desc">Pilih kamera belakang Anda, klik tombol mulai, lalu arahkan ke QR Code voucher</p>
 
-    <!-- Informasi Penggunaan yang sudah dirapikan -->
-    <div class="info">
-        <p>Klik tombol Izinkan Akses Kamera, lalu Konfirmasi Izinkan.</p>
-        <p>Jika Kamera depan yang aktif, silakan ganti ke kamera belakang lewat menu pilihan.</p>
-        <p>Klik Hentikan Kamera jika ingin mengganti opsi kamera.</p>
-        <p>Pindai voucher dengan mengarahkan kamera ke QR Code voucher.</p>
-        <p>Selamat Berselancar!</p>
+        <!-- Kotak Scanner Kamera / Pilih File -->
+        <div id="reader"></div>
+
+        <div id="status" class="status">Menghubungkan ke Kamera...</div>
+
+        <!-- Informasi Penggunaan yang sudah dirapikan -->
+        <div class="info">
+            <p>Klik tombol Izinkan Akses Kamera, lalu Konfirmasi Izinkan.</p>
+            <p>Jika Kamera depan yang aktif, silakan ganti ke kamera belakang lewat menu pilihan.</p>
+            <p>Klik Hentikan Kamera jika ingin mengganti opsi kamera.</p>
+            <p>Pindai voucher dengan mengarahkan kamera ke QR Code voucher.</p>
+            <p>Selamat Berselancar!</p>
+        </div>
     </div>
-</div>
 
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const dstIp = urlParams.get('link') || "http://192.168.88.1"; 
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const dstIp = urlParams.get('link') || "http://192.168.88.1";
 
-    function onScanSuccess(decodedText, decodedResult) {
-        document.getElementById('status').innerText = "QR Terdeteksi! Mengalihkan...";
-        document.getElementById('status').style.color = "green";
-        
-        html5QrcodeScanner.clear();
-
-        // Siapkan variabel awal (default disamakan)
-        let finalUsername = decodedText;
-        let finalPassword = decodedText;
-
-        // Jika QR Code mendeteksi adanya struktur link URL dari mikhmon
-        if (decodedText.includes("username=") || decodedText.includes("user=")) {
-            try {
-                // Ekstrak parameter dari teks URL hasil scan secara akurat
-                const urlParts = decodedText.split('?');
-                if (urlParts.length > 1) {
-                    const searchParams = new URLSearchParams('?' + urlParts[1]);
-                    
-                    // Ambil username asli dari link
-                    if (searchParams.has('username')) {
-                        finalUsername = searchParams.get('username');
-                    } else if (searchParams.has('user')) {
-                        finalUsername = searchParams.get('user');
-                    }
-
-                    // Ambil password asli dari link (jika ada)
-                    if (searchParams.has('password')) {
-                        finalPassword = searchParams.get('password');
-                    } else {
-                        // Jika di link tidak ada password, samakan nilainya dengan username
-                        finalPassword = finalUsername;
-                    }
-                }
-            } catch (err) {
-                console.log("Gagal mengekstrak URL, menggunakan teks mentah.");
-            }
+        function onScanSuccess(decodedText, decodedResult) {
+            // decodedText adalah isi mentah dari QR Code (http://iber.net)
+            // Langsung lemparkan browser ke alamat tersebut
+            window.location.href = decodedText;
         }
 
-        // Tembakkan data yang sudah dipisah secara akurat ke MikroTik Anda
-        const loginUrl = `${dstIp}?username=${encodeURIComponent(finalUsername)}&password=${encodeURIComponent(finalPassword)}`;
-        window.location.href = loginUrl;
-    }
+        // function onScanSuccess(decodedText, decodedResult) {
+        //     document.getElementById('status').innerText = "QR Terdeteksi! Mengalihkan...";
+        //     document.getElementById('status').style.color = "green";
 
-    function onScanFailure(error) {
-        // Diabaikan saat proses scan berjalan
-    }
+        //     html5QrcodeScanner.clear();
 
-    try {
-        var html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", 
-            { fps: 15, qrbox: {width: 300, height: 300} }, 
+        //     // Siapkan variabel awal (default disamakan)
+        //     let finalUsername = decodedText;
+        //     let finalPassword = decodedText;
+
+        //     // Jika QR Code mendeteksi adanya struktur link URL dari mikhmon
+        //     if (decodedText.includes("username=") || decodedText.includes("user=")) {
+        //         try {
+        //             // Ekstrak parameter dari teks URL hasil scan secara akurat
+        //             const urlParts = decodedText.split('?');
+        //             if (urlParts.length > 1) {
+        //                 const searchParams = new URLSearchParams('?' + urlParts[1]);
+
+        //                 // Ambil username asli dari link
+        //                 if (searchParams.has('username')) {
+        //                     finalUsername = searchParams.get('username');
+        //                 } else if (searchParams.has('user')) {
+        //                     finalUsername = searchParams.get('user');
+        //                 }
+
+        //                 // Ambil password asli dari link (jika ada)
+        //                 if (searchParams.has('password')) {
+        //                     finalPassword = searchParams.get('password');
+        //                 } else {
+        //                     // Jika di link tidak ada password, samakan nilainya dengan username
+        //                     finalPassword = finalUsername;
+        //                 }
+        //             }
+        //         } catch (err) {
+        //             console.log("Gagal mengekstrak URL, menggunakan teks mentah.");
+        //         }
+        //     }
+
+        //     // Tembakkan data yang sudah dipisah secara akurat ke MikroTik Anda
+        //     const loginUrl = `http://iber.net{encodeURIComponent(finalUsername)}&password=${encodeURIComponent(finalPassword)}`;
+        //     window.location.href = loginUrl;
+        // }
+
+        function onScanFailure(error) {
+            // Diabaikan saat proses scan berjalan
+        }
+
+        try {
+            var html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader",
+                { fps: 15, qrbox: { width: 300, height: 300 } },
             /* verbose= */ false
-        );
-        
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-    } catch (e) {
-        document.getElementById('status').innerText = "Gagal memuat kamera: " + e.message;
-        document.getElementById('status').style.color = "red";
-    }
+            );
 
-    // ========================================================
-    // TRIK MANIPULASI BAHASA INDONESIA SECARA REAL-TIME
-    // ========================================================
-    const translateHotspotUI = () => {
-        // 1. Terjemahkan tombol-tombol utama
-        const buttons = document.querySelectorAll("#reader button");
-        buttons.forEach(button => {
-            let text = button.innerText.trim();
-            if (text === "Request Camera Permissions") {
-                button.innerText = "Izinkan Akses Kamera 📷";
-            } else if (text === "Start Scanning") {
-                button.innerText = "Mulai Kamera 🚀";
-                button.style.backgroundColor = "#007bff";
-            } else if (text === "Stop Scanning") {
-                button.innerText = "Hentikan Kamera ❌";
-                button.style.backgroundColor = "#dc3545"; 
-            } else if (text === "Choose Image" || text === "Choose File") {
-                button.innerText = "Pilih Gambar Voucher 🖼️";
-                button.style.backgroundColor = "#28a745"; 
-            }
-        });
-
-        // 2. Perbaikan Terjemahan Tautan Tukar Metode (Mencari semua elemen text link)
-        const allLinks = document.querySelectorAll("#reader a, #reader span");
-        allLinks.forEach(link => {
-            let text = link.innerText.trim();
-            if (text.toLowerCase().includes("scan an image file")) {
-                link.innerText = "📂 Scan Lewat File Gambar/Foto";
-            } else if (text.toLowerCase().includes("scan using camera directly")) {
-                link.innerText = "📷 Gunakan Kamera Secara Langsung";
-            }
-        });
-
-        // 3. Mengontrol Teks Status Utama Sesuai Kondisi Antarmuka Kamera
-        const statusEl = document.getElementById('status');
-        const startButton = Array.from(buttons).find(b => b.innerText.includes("Mulai Kamera"));
-        const stopButton = Array.from(buttons).find(b => b.innerText.includes("Hentikan Kamera"));
-        const requestButton = Array.from(buttons).find(b => b.innerText.includes("Izinkan Akses Kamera"));
-
-        if (requestButton) {
-            statusEl.innerText = "Silakan klik 'Izinkan Akses Kamera' untuk memulai.";
-            statusEl.style.color = "#444";
-        } else if (startButton) {
-            statusEl.innerText = "Kamera Siap. Silakan klik 'Mulai Kamera'.";
-            statusEl.style.color = "#444";
-        } else if (stopButton) {
-            statusEl.innerText = "Kamera Aktif! Tempatkan QR Code di dalam kotak.";
-            statusEl.style.color = "#007bff";
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        } catch (e) {
+            document.getElementById('status').innerText = "Gagal memuat kamera: " + e.message;
+            document.getElementById('status').style.color = "red";
         }
 
-        // 4. Terjemahan error bawaan
-        const containerTexts = document.querySelectorAll("#reader div");
-        containerTexts.forEach(div => {
-            if (div.innerText.includes("Permission denied")) {
-                div.innerText = "Akses kamera ditolak. Silakan izinkan melalui pengaturan browser Anda.";
-                div.style.color = "red";
-                statusEl.innerText = "Akses Kamera Ditolak.";
-                statusEl.style.color = "red";
-            }
-        });
-    };
+        // ========================================================
+        // TRIK MANIPULASI BAHASA INDONESIA SECARA REAL-TIME
+        // ========================================================
+        const translateHotspotUI = () => {
+            // 1. Terjemahkan tombol-tombol utama
+            const buttons = document.querySelectorAll("#reader button");
+            buttons.forEach(button => {
+                let text = button.innerText.trim();
+                if (text === "Request Camera Permissions") {
+                    button.innerText = "Izinkan Akses Kamera 📷";
+                } else if (text === "Start Scanning") {
+                    button.innerText = "Mulai Kamera 🚀";
+                    button.style.backgroundColor = "#007bff";
+                } else if (text === "Stop Scanning") {
+                    button.innerText = "Hentikan Kamera ❌";
+                    button.style.backgroundColor = "#dc3545";
+                } else if (text === "Choose Image" || text === "Choose File") {
+                    button.innerText = "Pilih Gambar Voucher 🖼️";
+                    button.style.backgroundColor = "#28a745";
+                }
+            });
 
-    // Jalankan pengecekan teks UI setiap 200 milidetik agar lebih responsif
-    setInterval(translateHotspotUI, 200);
-</script>
+            // 2. Perbaikan Terjemahan Tautan Tukar Metode (Mencari semua elemen text link)
+            const allLinks = document.querySelectorAll("#reader a, #reader span");
+            allLinks.forEach(link => {
+                let text = link.innerText.trim();
+                if (text.toLowerCase().includes("scan an image file")) {
+                    link.innerText = "📂 Scan Lewat File Gambar/Foto";
+                } else if (text.toLowerCase().includes("scan using camera directly")) {
+                    link.innerText = "📷 Gunakan Kamera Secara Langsung";
+                }
+            });
+
+            // 3. Mengontrol Teks Status Utama Sesuai Kondisi Antarmuka Kamera
+            const statusEl = document.getElementById('status');
+            const startButton = Array.from(buttons).find(b => b.innerText.includes("Mulai Kamera"));
+            const stopButton = Array.from(buttons).find(b => b.innerText.includes("Hentikan Kamera"));
+            const requestButton = Array.from(buttons).find(b => b.innerText.includes("Izinkan Akses Kamera"));
+
+            if (requestButton) {
+                statusEl.innerText = "Silakan klik 'Izinkan Akses Kamera' untuk memulai.";
+                statusEl.style.color = "#444";
+            } else if (startButton) {
+                statusEl.innerText = "Kamera Siap. Silakan klik 'Mulai Kamera'.";
+                statusEl.style.color = "#444";
+            } else if (stopButton) {
+                statusEl.innerText = "Kamera Aktif! Tempatkan QR Code di dalam kotak.";
+                statusEl.style.color = "#007bff";
+            }
+
+            // 4. Terjemahan error bawaan
+            const containerTexts = document.querySelectorAll("#reader div");
+            containerTexts.forEach(div => {
+                if (div.innerText.includes("Permission denied")) {
+                    div.innerText = "Akses kamera ditolak. Silakan izinkan melalui pengaturan browser Anda.";
+                    div.style.color = "red";
+                    statusEl.innerText = "Akses Kamera Ditolak.";
+                    statusEl.style.color = "red";
+                }
+            });
+        };
+
+        // Jalankan pengecekan teks UI setiap 200 milidetik agar lebih responsif
+        setInterval(translateHotspotUI, 200);
+    </script>
 
 </body>
+
 </html>
