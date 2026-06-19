@@ -5,23 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner Hotspot</title>
     
-    <!-- PERBAIKAN UTAMA: Memanggil file script yang ada di dalam repositori sendiri -->
     <script src="html5-qrcode.min.js" type="text/javascript"></script>
     
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f6f9; padding: 20px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #333; }
-        #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #eee; }
-        .status { margin-top: 15px; font-weight: bold; color: #666; }
+        body { font-family: sans-serif; text-align: center; background: #f4f6f9; padding: 15px; margin: 0; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 25px 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { color: #222; margin-top: 0; font-size: 22px; }
+        p { color: #666; font-size: 14px; margin-bottom: 20px; line-height: 1.4; }
+        
+        /* MODIFIKASI: Memperbesar area kotak pemindai kamera */
+        #reader { width: 100% !important; border: none !important; border-radius: 12px; overflow: hidden; background: #fafafa; }
+        #reader video { width: 100% !important; border-radius: 12px; object-fit: cover; }
+        
+        /* MODIFIKASI: Menyembunyikan opsi "Scan an Image File" secara total */
+        #reader__dashboard_section_csr button:nth-child(2),
+        #reader__dashboard_section_csr span {
+            display: none !important;
+        }
+        
+        /* MODIFIKASI: Mempercantik tombol "Start Scanning" / "Stop Scanning" bawaan library */
+        #reader button { 
+            background-color: #007bff !important; 
+            color: white !important; 
+            border: none !important; 
+            padding: 12px 24px !important; 
+            font-size: 15px !important; 
+            font-weight: bold !important; 
+            border-radius: 8px !important; 
+            cursor: pointer !important;
+            margin: 10px 0 !important;
+            box-shadow: 0 3px 6px rgba(0,123,255,0.2);
+        }
+        #reader button:hover { background-color: #0056b3 !important; }
+        
+        /* Merapikan dropdown pilihan kamera */
+        #reader select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            background-color: #fff;
+        }
+
+        .status { margin-top: 20px; font-weight: bold; color: #444; font-size: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Pindai Voucher Wi-Fi</h2>
-    <p>Izinkan akses kamera jika muncul permintaan prompt, lalu arahkan kamera ke QR Code</p>
+    <p>Pilih kamera belakang Anda, klik tombol mulai, lalu arahkan ke QR Code voucher</p>
     
+    <!-- Kotak Scanner Kamera -->
     <div id="reader"></div>
     
     <div id="status" class="status">Menghubungkan ke Kamera...</div>
@@ -29,7 +65,7 @@
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const dstIp = urlParams.get('link') || "http://192.168.88.1"; 
+    const dstIp = urlParams.get('link') || "http://10.5.5"; 
 
     function onScanSuccess(decodedText, decodedResult) {
         document.getElementById('status').innerText = "QR Terdeteksi! Mengalihkan...";
@@ -42,19 +78,20 @@
     }
 
     function onScanFailure(error) {
-        // Abaikan pencarian frame real-time
+        // Diabaikan saat proses scan berjalan
     }
 
     try {
+        // MODIFIKASI: Memperbesar qrbox menjadi ukuran maksimal 300x300 agar lebih mudah membidik QR kecil
         var html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", 
-            { fps: 15, qrbox: {width: 250, height: 250} }, 
+            { fps: 15, qrbox: {width: 300, height: 300} }, 
             /* verbose= */ false
         );
         
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         
-        document.getElementById('status').innerText = "Kamera Siap. Silakan Scan.";
+        document.getElementById('status').innerText = "Kamera Siap. Silakan Klik 'Start Scanning'.";
     } catch (e) {
         document.getElementById('status').innerText = "Gagal memuat kamera: " + e.message;
         document.getElementById('status').style.color = "red";
