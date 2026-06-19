@@ -118,7 +118,40 @@
         
         html5QrcodeScanner.clear();
 
-        const loginUrl = `${dstIp}?username=${encodeURIComponent(decodedText)}&password=${encodeURIComponent(decodedText)}`;
+        // Siapkan variabel awal (default disamakan)
+        let finalUsername = decodedText;
+        let finalPassword = decodedText;
+
+        // Jika QR Code mendeteksi adanya struktur link URL dari mikhmon
+        if (decodedText.includes("username=") || decodedText.includes("user=")) {
+            try {
+                // Ekstrak parameter dari teks URL hasil scan secara akurat
+                const urlParts = decodedText.split('?');
+                if (urlParts.length > 1) {
+                    const searchParams = new URLSearchParams('?' + urlParts[1]);
+                    
+                    // Ambil username asli dari link
+                    if (searchParams.has('username')) {
+                        finalUsername = searchParams.get('username');
+                    } else if (searchParams.has('user')) {
+                        finalUsername = searchParams.get('user');
+                    }
+
+                    // Ambil password asli dari link (jika ada)
+                    if (searchParams.has('password')) {
+                        finalPassword = searchParams.get('password');
+                    } else {
+                        // Jika di link tidak ada password, samakan nilainya dengan username
+                        finalPassword = finalUsername;
+                    }
+                }
+            } catch (err) {
+                console.log("Gagal mengekstrak URL, menggunakan teks mentah.");
+            }
+        }
+
+        // Tembakkan data yang sudah dipisah secara akurat ke MikroTik Anda
+        const loginUrl = `${dstIp}?username=${encodeURIComponent(finalUsername)}&password=${encodeURIComponent(finalPassword)}`;
         window.location.href = loginUrl;
     }
 
@@ -167,7 +200,7 @@
             let text = link.innerText.trim();
             if (text.toLowerCase().includes("scan an image file")) {
                 link.innerText = "📂 Scan Lewat File Gambar/Foto";
-            } else if (text.toLowerCase().includes("scan using chip camera directly")) {
+            } else if (text.toLowerCase().includes("scan using camera directly")) {
                 link.innerText = "📷 Gunakan Kamera Secara Langsung";
             }
         });
@@ -205,5 +238,5 @@
     setInterval(translateHotspotUI, 200);
 </script>
 
-</head>
+</body>
 </html>
