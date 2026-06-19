@@ -13,17 +13,18 @@
         h2 { color: #222; margin-top: 0; font-size: 22px; }
         p { color: #666; font-size: 14px; margin-bottom: 20px; line-height: 1.4; }
         
-        /* MODIFIKASI: Memperbesar area kotak pemindai kamera */
+        /* Memperbesar dan merapikan kotak pemindai */
         #reader { width: 100% !important; border: none !important; border-radius: 12px; overflow: hidden; background: #fafafa; }
         #reader video { width: 100% !important; border-radius: 12px; object-fit: cover; }
         
-        /* MODIFIKASI: Menyembunyikan opsi "Scan an Image File" secara total */
-        #reader__dashboard_section_csr button:nth-child(2),
-        #reader__dashboard_section_csr span {
+        /* MENYEMBUNYIKAN SEBELUM SCAN: Menghilangkan opsi "Scan an Image File" & garis pembatas bawaan library */
+        #reader__dashboard_section_csr button:last-child,
+        #reader__dashboard_section_csr span,
+        #reader__dashboard_section_swaplink {
             display: none !important;
         }
         
-        /* MODIFIKASI: Mempercantik tombol "Start Scanning" / "Stop Scanning" bawaan library */
+        /* Mempercantik tombol bawaan agar terlihat seragam */
         #reader button { 
             background-color: #007bff !important; 
             color: white !important; 
@@ -35,17 +36,19 @@
             cursor: pointer !important;
             margin: 10px 0 !important;
             box-shadow: 0 3px 6px rgba(0,123,255,0.2);
+            transition: background 0.2s;
         }
         #reader button:hover { background-color: #0056b3 !important; }
         
         /* Merapikan dropdown pilihan kamera */
         #reader select {
-            padding: 8px 12px;
+            padding: 10px 14px;
             font-size: 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid #ccc;
             margin-bottom: 10px;
             background-color: #fff;
+            font-weight: 500;
         }
 
         .status { margin-top: 20px; font-weight: bold; color: #444; font-size: 15px; }
@@ -55,7 +58,7 @@
 
 <div class="container">
     <h2>Pindai Voucher Wi-Fi</h2>
-    <p>Pilih kamera belakang Anda, klik tombol mulai, lalu arahkan ke QR Code voucher</p>
+    <p>Izinkan akses kamera, pilih kamera belakang, lalu arahkan lensa ke QR Code voucher Anda</p>
     
     <!-- Kotak Scanner Kamera -->
     <div id="reader"></div>
@@ -78,11 +81,10 @@
     }
 
     function onScanFailure(error) {
-        // Diabaikan saat proses scan berjalan
+        // Diabaikan saat scanning berjalan
     }
 
     try {
-        // MODIFIKASI: Memperbesar qrbox menjadi ukuran maksimal 300x300 agar lebih mudah membidik QR kecil
         var html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", 
             { fps: 15, qrbox: {width: 300, height: 300} }, 
@@ -91,11 +93,38 @@
         
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         
-        document.getElementById('status').innerText = "Kamera Siap. Silakan Klik 'Start Scanning'.";
+        document.getElementById('status').innerText = "Kamera Siap. Silakan klik 'Mulai Kamera'.";
     } catch (e) {
         document.getElementById('status').innerText = "Gagal memuat kamera: " + e.message;
         document.getElementById('status').style.color = "red";
     }
+
+    // ========================================================
+    // TRIK MANIPULASI BAHASA INDONESIA SECARA REAL-TIME
+    // ========================================================
+    const translateHotspotUI = () => {
+        const buttons = document.querySelectorAll("#reader button");
+        buttons.forEach(button => {
+            let text = button.innerText.trim();
+            if (text === "Request Camera Permissions") {
+                button.innerText = "Izinkan Akses Kamera 📷";
+            } else if (text === "Start Scanning") {
+                button.innerText = "Mulai Kamera 🚀";
+            } else if (text === "Stop Scanning") {
+                button.innerText = "Hentikan Kamera ❌";
+                button.style.backgroundColor = "#dc3545" // Mengubah warna tombol stop menjadi merah gres
+            }
+        });
+
+        // Terjemahan label info kamera jika teks bahasa inggris terdeteksi
+        const permissionText = document.querySelector("#reader div");
+        if (permissionText && permissionText.innerText.includes("Permission denied")) {
+            permissionText.innerText = "Akses kamera ditolak. Silakan izinkan melalui pengaturan browser Anda.";
+        }
+    };
+
+    // Jalankan pengecekan teks tombol setiap 300 milidetik agar langsung berubah saat UI berganti status
+    setInterval(translateHotspotUI, 300);
 </script>
 
 </body>
