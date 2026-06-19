@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner Hotspot</title>
-    <!-- Memuat library QR Scanner resmi -->
-    <script src="https://unpkg.com" type="text/javascript"></script>
+    
+    <!-- PERBAIKAN UTAMA: Memanggil file script yang ada di dalam repositori sendiri -->
+    <script src="html5-qrcode.min.js" type="text/javascript"></script>
+    
     <style>
         body { font-family: sans-serif; text-align: center; background: #f4f6f9; padding: 20px; margin: 0; }
         .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -18,39 +20,32 @@
 
 <div class="container">
     <h2>Pindai Voucher Wi-Fi</h2>
-    <p>Izinkan akses kamera jika muncul permintaan prom, lalu arahkan kamera ke QR Code</p>
+    <p>Izinkan akses kamera jika muncul permintaan prompt, lalu arahkan kamera ke QR Code</p>
     
-    <!-- Area Kamera Scanner -->
     <div id="reader"></div>
     
     <div id="status" class="status">Menghubungkan ke Kamera...</div>
 </div>
 
 <script>
-    // Ambil IP Gateway MikroTik dari URL parameter yang dikirim oleh login.html
     const urlParams = new URLSearchParams(window.location.search);
-    const dstIp = urlParams.get('link') || "http://10.5.5"; 
+    const dstIp = urlParams.get('link') || "http://192.168.88.1"; 
 
     function onScanSuccess(decodedText, decodedResult) {
         document.getElementById('status').innerText = "QR Terdeteksi! Mengalihkan...";
         document.getElementById('status').style.color = "green";
         
-        // Matikan scanner setelah sukses membaca data
         html5QrcodeScanner.clear();
 
-        // Mengirimkan kode voucher hasil scan (asumsi username dan password bernilai sama)
         const loginUrl = `${dstIp}?username=${encodeURIComponent(decodedText)}&password=${encodeURIComponent(decodedText)}`;
-        
-        // Alihkan kembali ke MikroTik untuk login otomatis
         window.location.href = loginUrl;
     }
 
     function onScanFailure(error) {
-        // Abaikan log error real-time pencarian frame gambar
+        // Abaikan pencarian frame real-time
     }
 
     try {
-        // PERBAIKAN: Menggunakan constructor resmi 'Html5QrcodeScanner'
         var html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", 
             { fps: 15, qrbox: {width: 250, height: 250} }, 
