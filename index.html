@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner Hotspot</title>
-    <!-- Memuat library QR Scanner dari CDN Resmi -->
+    <!-- Memuat library QR Scanner resmi -->
     <script src="https://unpkg.com" type="text/javascript"></script>
     <style>
         body { font-family: sans-serif; text-align: center; background: #f4f6f9; padding: 20px; margin: 0; }
@@ -18,51 +18,52 @@
 
 <div class="container">
     <h2>Pindai Voucher Wi-Fi</h2>
-    <p>Arahkan kamera HP Anda ke QR Code pada voucher</p>
+    <p>Izinkan akses kamera jika muncul permintaan prom, lalu arahkan kamera ke QR Code</p>
     
     <!-- Area Kamera Scanner -->
     <div id="reader"></div>
     
-    <div id="status" class="status">Menginisialisasi Kamera...</div>
+    <div id="status" class="status">Menghubungkan ke Kamera...</div>
 </div>
 
 <script>
-    // Ambil IP Gateway / Domain MikroTik dari URL parameter yang dikirim oleh login.html
+    // Ambil IP Gateway MikroTik dari URL parameter yang dikirim oleh login.html
     const urlParams = new URLSearchParams(window.location.search);
-    const dstIp = urlParams.get('link') || "http://10.5.5"; // Default IP hotspot jika kosong
+    const dstIp = urlParams.get('link') || "http://10.5.5"; 
 
     function onScanSuccess(decodedText, decodedResult) {
         document.getElementById('status').innerText = "QR Terdeteksi! Mengalihkan...";
         document.getElementById('status').style.color = "green";
         
-        // Berhentikan kamera setelah sukses scan
+        // Matikan scanner setelah sukses membaca data
         html5QrcodeScanner.clear();
 
-        // Asumsi isi QR Code hanyalah teks KODE VOUCHER (Username saja)
-        // Kirim data langsung ke MikroTik menggunakan metode HTTP GET login
+        // Mengirimkan kode voucher hasil scan (asumsi username dan password bernilai sama)
         const loginUrl = `${dstIp}?username=${encodeURIComponent(decodedText)}&password=${encodeURIComponent(decodedText)}`;
         
-        // Alihkan pengguna kembali ke MikroTik untuk proses login otomatis
+        // Alihkan kembali ke MikroTik untuk login otomatis
         window.location.href = loginUrl;
     }
 
     function onScanFailure(error) {
-        // Abaikan error real-time saat mencari kecocokan frame QR
+        // Abaikan log error real-time pencarian frame gambar
     }
 
-    // Inisialisasi Scanner
-    let html5QrcodeScanner = new Html5Scanner(
-        "reader", 
-        { fps: 10, qrbox: {width: 250, height: 250} }, 
-        /* verbose= */ false
-    );
-    
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-    
-    // Ubah status jika kamera siap
-    setTimeout(() => {
+    try {
+        // PERBAIKAN: Menggunakan constructor resmi 'Html5QrcodeScanner'
+        var html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", 
+            { fps: 15, qrbox: {width: 250, height: 250} }, 
+            /* verbose= */ false
+        );
+        
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        
         document.getElementById('status').innerText = "Kamera Siap. Silakan Scan.";
-    }, 1500);
+    } catch (e) {
+        document.getElementById('status').innerText = "Gagal memuat kamera: " + e.message;
+        document.getElementById('status').style.color = "red";
+    }
 </script>
 
 </body>
