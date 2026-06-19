@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner Hotspot</title>
+    <!-- Memuat library QR Scanner dari CDN Resmi -->
+    <script src="https://unpkg.com" type="text/javascript"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f6f9; padding: 20px; margin: 0; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #eee; }
+        .status { margin-top: 15px; font-weight: bold; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Pindai Voucher Wi-Fi</h2>
+    <p>Arahkan kamera HP Anda ke QR Code pada voucher</p>
+    
+    <!-- Area Kamera Scanner -->
+    <div id="reader"></div>
+    
+    <div id="status" class="status">Menginisialisasi Kamera...</div>
+</div>
+
+<script>
+    // Ambil IP Gateway / Domain MikroTik dari URL parameter yang dikirim oleh login.html
+    const urlParams = new URLSearchParams(window.location.search);
+    const dstIp = urlParams.get('link') || "http://10.5.5"; // Default IP hotspot jika kosong
+
+    function onScanSuccess(decodedText, decodedResult) {
+        document.getElementById('status').innerText = "QR Terdeteksi! Mengalihkan...";
+        document.getElementById('status').style.color = "green";
+        
+        // Berhentikan kamera setelah sukses scan
+        html5QrcodeScanner.clear();
+
+        // Asumsi isi QR Code hanyalah teks KODE VOUCHER (Username saja)
+        // Kirim data langsung ke MikroTik menggunakan metode HTTP GET login
+        const loginUrl = `${dstIp}?username=${encodeURIComponent(decodedText)}&password=${encodeURIComponent(decodedText)}`;
+        
+        // Alihkan pengguna kembali ke MikroTik untuk proses login otomatis
+        window.location.href = loginUrl;
+    }
+
+    function onScanFailure(error) {
+        // Abaikan error real-time saat mencari kecocokan frame QR
+    }
+
+    // Inisialisasi Scanner
+    let html5QrcodeScanner = new Html5Scanner(
+        "reader", 
+        { fps: 10, qrbox: {width: 250, height: 250} }, 
+        /* verbose= */ false
+    );
+    
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    
+    // Ubah status jika kamera siap
+    setTimeout(() => {
+        document.getElementById('status').innerText = "Kamera Siap. Silakan Scan.";
+    }, 1500);
+</script>
+
+</body>
+</html>
