@@ -360,43 +360,6 @@
             } else if (stopButton) {
                 statusEl.innerText = "Kamera Aktif! Tempatkan QR Code di dalam kotak.";
                 statusEl.style.color = "#00ff66";
-                    button.innerText = "Mulai Kamera 🚀";
-                    button.style.backgroundColor = "#007bff";
-                } else if (text === "Stop Scanning") {
-                    button.innerText = "Hentikan Kamera ❌";
-                    button.style.backgroundColor = "#dc3545";
-                } else if (text === "Choose Image" || text === "Choose File") {
-                    button.innerText = "Pilih Gambar Voucher 🖼️";
-                    button.style.backgroundColor = "#28a745";
-                }
-            });
-
-            // 2. Perbaikan Terjemahan Tautan Tukar Metode (Mencari semua elemen text link)
-            const allLinks = document.querySelectorAll("#reader a, #reader span");
-            allLinks.forEach(link => {
-                let text = link.innerText.trim();
-                if (text.toLowerCase().includes("scan an image file")) {
-                    link.innerText = "📂 Scan Lewat File Gambar/Foto";
-                } else if (text.toLowerCase().includes("scan using camera directly")) {
-                    link.innerText = "📷 Gunakan Kamera Secara Langsung";
-                }
-            });
-
-            // 3. Mengontrol Teks Status Utama Sesuai Kondisi Antarmuka Kamera
-            const statusEl = document.getElementById('status');
-            const startButton = Array.from(buttons).find(b => b.innerText.includes("Mulai Kamera"));
-            const stopButton = Array.from(buttons).find(b => b.innerText.includes("Hentikan Kamera"));
-            const requestButton = Array.from(buttons).find(b => b.innerText.includes("Izinkan Akses Kamera"));
-
-            if (requestButton) {
-                statusEl.innerText = "Silakan klik 'Izinkan Akses Kamera' untuk memulai.";
-                statusEl.style.color = "#444";
-            } else if (startButton) {
-                statusEl.innerText = "Kamera Siap. Silakan klik 'Mulai Kamera'.";
-                statusEl.style.color = "#444";
-            } else if (stopButton) {
-                statusEl.innerText = "Kamera Aktif! Tempatkan QR Code di dalam kotak.";
-                statusEl.style.color = "#007bff";
             }
 
             // 4. Terjemahan error bawaan dan penanganan masalah iOS CNA (Popup)
