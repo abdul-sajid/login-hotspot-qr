@@ -283,14 +283,22 @@
                 statusEl.style.color = "#007bff";
             }
 
-            // 4. Terjemahan error bawaan
-            const containerTexts = document.querySelectorAll("#reader div");
-            containerTexts.forEach(div => {
-                if (div.innerText.includes("Permission denied")) {
-                    div.innerText = "Akses kamera ditolak. Silakan izinkan melalui pengaturan browser Anda.";
-                    div.style.color = "red";
-                    statusEl.innerText = "Akses Kamera Ditolak.";
-                    statusEl.style.color = "red";
+            // 4. Terjemahan error bawaan dan penanganan masalah iOS CNA (Popup)
+            const containerTexts = document.querySelectorAll("#reader div, #reader span");
+            containerTexts.forEach(el => {
+                // Pastikan elemen bukan container utama dengan mengecek tidak ada button/link di dalamnya
+                if (!el.querySelector('button') && !el.querySelector('a')) {
+                    if (el.innerText.includes("Permission denied") || el.innerText.includes("NotAllowedError")) {
+                        el.innerText = "Akses kamera ditolak. Silakan izinkan melalui pengaturan browser Anda.";
+                        el.style.color = "red";
+                        statusEl.innerText = "Akses Kamera Ditolak.";
+                        statusEl.style.color = "red";
+                    } else if (el.innerText.includes("Unable to query supported devices") || el.innerText.includes("unknown error") || el.innerText.includes("NotSupportedError")) {
+                        el.innerHTML = "<div style='background:#ffebee; padding:10px; border-radius:8px; border: 1px solid #f5c6cb; margin-bottom: 10px;'><b>Peringatan iOS:</b> Kamera tidak bisa digunakan di layar popup ini.<br><br><b>Solusi 1:</b> Gunakan opsi <b>'Scan Lewat File Gambar/Foto'</b> di bawah ini.<br><b>Solusi 2:</b> Tutup layar ini, lalu buka browser <b>Safari / Chrome</b> dan buka halaman login.</div>";
+                        el.style.color = "#dc3545";
+                        statusEl.innerText = "Kamera tidak didukung di Popup ini.";
+                        statusEl.style.color = "#dc3545";
+                    }
                 }
             });
         };
