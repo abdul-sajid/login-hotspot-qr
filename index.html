@@ -9,43 +9,101 @@
     <script src="html5-qrcode.min.js" type="text/javascript"></script>
 
     <style>
+        :root {
+            --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --soccer-green: #00ff66;
+            --card-bg: rgba(18, 20, 28, 0.9);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
         body {
-            font-family: sans-serif;
-            text-align: center;
-            background: #f4f6f9;
-            padding: 15px;
+            background-color: #07080d;
+            color: #f3f4f6;
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
             margin: 0;
+            padding: 16px;
+            background-image: radial-gradient(#141620 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 255, 102, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            bottom: 10%;
+            right: 0;
+            width: 450px;
+            height: 450px;
+            background: rgba(0, 255, 102, 0.02) blur(150px);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .container {
+            width: 100%;
             max-width: 500px;
-            margin: auto;
-            background: white;
-            padding: 25px 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0, 255, 102, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(225deg, rgba(0, 255, 102, 0.05), transparent);
+            pointer-events: none;
         }
 
         h2 {
-            color: #222;
+            font-size: 20px;
+            font-weight: 900;
+            color: #ffffff;
             margin-top: 0;
-            font-size: 22px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
 
         .desc {
-            color: #666;
-            font-size: 14px;
+            font-size: 13px;
+            color: #a0aec0;
             margin-bottom: 20px;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
-        /* Merapikan area kotak pemindai kamera */
         #reader {
             width: 100% !important;
-            border: none !important;
-            border-radius: 12px;
+            border: 1px dashed rgba(16, 185, 129, 0.3) !important;
+            border-radius: 14px;
             overflow: hidden;
-            background: #fafafa;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
         }
 
         #reader video {
@@ -54,90 +112,97 @@
             object-fit: cover;
         }
 
-        /* Mempercantik tombol bawaan library */
         #reader button {
-            background-color: #007bff !important;
-            color: white !important;
+            background: linear-gradient(135deg, #10b981, #14b8a6) !important;
+            color: #ffffff !important;
             border: none !important;
             padding: 12px 24px !important;
-            font-size: 15px !important;
-            font-weight: bold !important;
-            border-radius: 8px !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+            border-radius: 10px !important;
             cursor: pointer !important;
-            margin: 8px 0 !important;
-            box-shadow: 0 3px 6px rgba(0, 123, 255, 0.2);
-            transition: background 0.2s, transform 0.1s;
+            margin: 8px 4px !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         #reader button:hover {
-            background-color: #0056b3 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(20, 184, 166, 0.35);
         }
 
-        #reader button:active {
-            transform: scale(0.98);
-        }
-
-        /* Merapikan dropdown pilihan kamera dan link tukar metode file */
         #reader select {
-            padding: 10px 14px;
-            font-size: 14px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            padding: 12px 14px;
+            font-size: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             margin: 10px 0;
-            background-color: #fff;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #fff;
             width: 90%;
             max-width: 320px;
+            outline: none;
         }
 
-        /* Menghias tautan teks ganti metode (kamera <=> file) */
+        #reader select:focus {
+            border-color: rgba(0, 255, 102, 0.5);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
+        }
+
+        #reader select option {
+            background-color: #141620;
+            color: #fff;
+        }
+
         #reader a,
         #reader__dashboard_section_swaplink {
-            color: #007bff !important;
+            color: var(--soccer-green) !important;
             font-weight: bold;
             text-decoration: none;
             display: inline-block;
             margin: 12px 0;
-            font-size: 15px;
+            font-size: 12px;
         }
 
         #reader a:hover {
             text-decoration: underline;
+            color: #ffffff !important;
         }
 
-        /* Merapikan status teks */
         .status {
             margin-top: 20px;
             font-weight: bold;
-            color: #444;
-            font-size: 15px;
+            color: #cbd5e0;
+            font-size: 13px;
         }
 
-        /* Desain Kotak Informasi Penggunaan di bagian bawah */
         .info {
-            margin-top: 25px;
-            background: #f8f9fa;
-            border-left: 4px solid #007bff;
-            padding: 15px;
-            border-radius: 8px;
+            margin-top: 24px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 12px;
             text-align: left;
         }
 
         .info p {
-            color: #555;
-            font-size: 13px;
-            margin: 6px 0;
-            line-height: 1.4;
+            color: #a0aec0;
+            font-size: 11px;
+            margin: 8px 0;
+            line-height: 1.5;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
+            gap: 8px;
         }
 
         .info p::before {
             content: "•";
-            color: #007bff;
+            color: var(--soccer-green);
             font-weight: bold;
-            display: inline-block;
-            width: 15px;
-            font-size: 16px;
+            font-size: 14px;
+            line-height: 1;
         }
     </style>
 </head>
@@ -245,13 +310,13 @@
                     button.innerText = "Izinkan Akses Kamera 📷";
                 } else if (text === "Start Scanning") {
                     button.innerText = "Mulai Kamera 🚀";
-                    button.style.backgroundColor = "#007bff";
+                    button.style.background = "linear-gradient(135deg, #10b981, #14b8a6)";
                 } else if (text === "Stop Scanning") {
                     button.innerText = "Hentikan Kamera ❌";
-                    button.style.backgroundColor = "#dc3545";
+                    button.style.background = "linear-gradient(135deg, #ef4444, #dc2626)";
                 } else if (text === "Choose Image" || text === "Choose File") {
                     button.innerText = "Pilih Gambar Voucher 🖼️";
-                    button.style.backgroundColor = "#28a745";
+                    button.style.background = "linear-gradient(135deg, #f59e0b, #d97706)";
                 }
             });
 
@@ -274,13 +339,13 @@
 
             if (requestButton) {
                 statusEl.innerText = "Silakan klik 'Izinkan Akses Kamera' untuk memulai.";
-                statusEl.style.color = "#444";
+                statusEl.style.color = "#cbd5e0";
             } else if (startButton) {
                 statusEl.innerText = "Kamera Siap. Silakan klik 'Mulai Kamera'.";
-                statusEl.style.color = "#444";
+                statusEl.style.color = "#cbd5e0";
             } else if (stopButton) {
                 statusEl.innerText = "Kamera Aktif! Tempatkan QR Code di dalam kotak.";
-                statusEl.style.color = "#007bff";
+                statusEl.style.color = "#00ff66";
             }
 
             // 4. Terjemahan error bawaan dan penanganan masalah iOS CNA (Popup)
