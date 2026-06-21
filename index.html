@@ -120,10 +120,12 @@
             padding: 10px;
         }
 
-        #reader video {
+        #reader video,
+        #reader canvas {
             width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
             border-radius: 12px;
-            object-fit: cover;
         }
 
         #reader button {
@@ -302,7 +304,14 @@
         try {
             var html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
-                { fps: 15, qrbox: { width: 300, height: 300 } },
+                { 
+                    fps: 15, 
+                    qrbox: function(viewfinderWidth, viewfinderHeight) {
+                        var minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+                        var qrboxSize = Math.floor(minEdgeSize * 0.75); // 75% dari layar
+                        return { width: qrboxSize, height: qrboxSize };
+                    } 
+                },
             /* verbose= */ false
             );
 
