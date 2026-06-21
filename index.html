@@ -377,9 +377,9 @@
                 // Pastikan elemen bukan container utama dengan mengecek tidak ada button/link di dalamnya
                 if (!el.querySelector('button') && !el.querySelector('a')) {
                     if (el.innerText.includes("Permission denied") || el.innerText.includes("NotAllowedError")) {
-                        el.innerText = "Akses kamera ditolak. Silakan izinkan melalui pengaturan browser Anda.";
+                        el.innerText = "Akses kamera ditolak. Silakan buka melalui browser google chrome/safari.";
                         el.style.color = "red";
-                        statusEl.innerText = "Akses Kamera Ditolak.";
+                        statusEl.innerText = "Akses Kamera Ditolak. Silakan izinkan melalui pengaturan browser Anda.";
                         statusEl.style.color = "red";
                     } else if (el.innerText.includes("Unable to query supported devices") || el.innerText.includes("unknown error") || el.innerText.includes("NotSupportedError")) {
                         el.innerHTML = "<div style='background:#ffebee; padding:10px; border-radius:8px; border: 1px solid #f5c6cb; margin-bottom: 10px;'><b>Peringatan:</b> Kamera tidak bisa digunakan di layar popup otomatis ini.<br><br><b>Solusi 1:</b> Tutup layar ini, lalu buka browser <b>Chrome / Safari</b> secara manual dan buka halaman login.<br><b>Solusi 2:</b> Gunakan opsi <b>'Scan Lewat File Gambar/Foto'</b> di bawah ini.</div>";
