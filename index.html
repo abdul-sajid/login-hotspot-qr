@@ -336,17 +336,18 @@
             var html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
                 {
-                    fps: 25,  // Increased FPS for more responsive scanning
+                    fps: 10,  // Lowering FPS slightly can give the camera more time to focus per frame
                     qrbox: function(viewfinderWidth, viewfinderHeight) {
                         var minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-                        // Adaptive QR box size: 60% for better focus, with minimum size constraint
-                        var qrboxSize = Math.floor(minEdgeSize * 0.6);
-                        // Ensure minimum size for usability
+                        // Adaptive QR box size: 85% for larger scanning area at close distance
+                        var qrboxSize = Math.floor(minEdgeSize * 0.85);
                         return {
-                            width: Math.max(qrboxSize, 150),
-                            height: Math.max(qrboxSize, 150)
+                            width: Math.max(qrboxSize, 250),
+                            height: Math.max(qrboxSize, 250)
                         };
-                    }
+                    },
+                    aspectRatio: 1.0,
+                    showTorchButtonIfSupported: true
                 },
             /* verbose= */ false
             );
