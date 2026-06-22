@@ -113,11 +113,24 @@
         #reader {
             width: 100% !important;
             max-width: 100%;
-            border: 1px dashed rgba(16, 185, 129, 0.3) !important;
+            border: 2px dashed rgba(16, 185, 129, 0.4) !important;
             border-radius: 14px;
             overflow: hidden;
             background: rgba(0, 0, 0, 0.4);
             padding: 10px;
+            position: relative;
+            /* Add scanning animation effect */
+            background-image:
+                linear-gradient(45deg, transparent 25%, rgba(0, 255, 102, 0.05) 25%, rgba(0, 255, 102, 0.05) 50%, transparent 50%, transparent 75%, rgba(0, 255, 102, 0.05) 75%, rgba(0, 255, 102, 0.05)),
+                linear-gradient(45deg, transparent 25%, rgba(0, 255, 102, 0.05) 25%, rgba(0, 255, 102, 0.05) 50%, transparent 50%, transparent 75%, rgba(0, 255, 102, 0.05) 75%, rgba(0, 255, 102, 0.05));
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { background-position: 0 0, 10px 10px; }
+            100% { background-position: -20px -20px, -10px -10px; }
         }
 
         #reader video,
@@ -232,14 +245,17 @@
         <!-- Kotak Scanner Kamera / Pilih File -->
         <div id="reader"></div>
 
-        <div id="status" class="status">Menghubungkan ke Kamera...</div>
+        <div id="status" class="status">Menyiapkan kamera untuk scanning...</div>
 
         <!-- Informasi Penggunaan yang sudah dirapikan -->
         <div class="info">
             <p>Klik tombol Izinkan Akses Kamera, lalu Konfirmasi Izinkan.</p>
             <p>Jika Kamera depan yang aktif, silakan ganti ke kamera belakang lewat menu pilihan.</p>
+            <p>Untuk hasil scanning terbaik:</p>
+            <p>&nbsp;&nbsp;&nbsp;• Pastikan pencahayaan cukup dan tidak terlalu terang</p>
+            <p>&nbsp;&nbsp;&nbsp;• Tarik/dekatkan pelan saat QR Code tidak terdeteksi</p>
+            <p>&nbsp;&nbsp;&nbsp;• Pastikan seluruh QR Code terlihat jelas dalam kotak scanning</p>
             <p>Klik Hentikan Kamera jika ingin mengganti opsi kamera.</p>
-            <p>Pindai voucher dengan mengarahkan kamera ke QR Code voucher.</p>
             <p>Selamat Berselancar!</p>
         </div>
     </div>
@@ -251,7 +267,13 @@
         function onScanSuccess(decodedText, decodedResult) {
             // decodedText adalah isi mentah dari QR Code (http://iber.net)
             // Langsung lemparkan browser ke alamat tersebut
-            window.location.href = decodedText;
+            document.getElementById('status').innerText = "QR Code Terdeteksi! Mengalihkan...";
+            document.getElementById('status').style.color = "#00ff66";
+
+            // Beri feedback visual sebelum redirect
+            setTimeout(function() {
+                window.location.href = decodedText;
+            }, 300);
         }
 
         // function onScanSuccess(decodedText, decodedResult) {
@@ -298,19 +320,32 @@
         // }
 
         function onScanFailure(error) {
-            // Diabaikan saat proses scan berjalan
+            // Memberi feedback Ringkas saat scan gagal, tapi tidak terlalu sering
+            // Hanya update status jika belum ada pesan sukses atau error yang jelas
+            var statusEl = document.getElementById('status');
+            if (statusEl && !statusEl.innerText.includes('QR Code Terdeteksi') &&
+                !statusEl.innerText.includes('Mengalihkan')) {
+                statusEl.innerText = "Mencari QR Code... Arahkan ke voucher";
+                statusEl.style.color = "#cbd5e0";
+            }
+            // Error sengaja diabaikan untuk tidak mengganggu pengguna dengan pesan berulang
         }
 
         try {
             var html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
-                { 
-                    fps: 15, 
+                {
+                    fps: 25,  // Increased FPS for more responsive scanning
                     qrbox: function(viewfinderWidth, viewfinderHeight) {
                         var minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-                        var qrboxSize = Math.floor(minEdgeSize * 0.75); // 75% dari layar
-                        return { width: qrboxSize, height: qrboxSize };
-                    } 
+                        // Adaptive QR box size: 60% for better focus, with minimum size constraint
+                        var qrboxSize = Math.floor(minEdgeSize * 0.6);
+                        // Ensure minimum size for usability
+                        return {
+                            width: Math.max(qrboxSize, 150),
+                            height: Math.max(qrboxSize, 150)
+                        };
+                    }
                 },
             /* verbose= */ false
             );
@@ -391,8 +426,11 @@
             });
         };
 
-        // Jalankan pengecekan teks UI setiap 200 milidetik agar lebih responsif
-        setInterval(translateHotspotUI, 200);
+        // Jalankan pengecekan teks UI setiap 500 milidetik untuk keseimbangan antara responsivitas dan performa
+        setInterval(translateHotspotUI, 500);
+
+        // Jalankan sekali saat awal untuk mengatur UI yang sesuai
+        translateHotspotUI();
     </script>
 
 </body>
