@@ -129,8 +129,13 @@
         }
 
         @keyframes scan {
-            0% { background-position: 0 0, 10px 10px; }
-            100% { background-position: -20px -20px, -10px -10px; }
+            0% {
+                background-position: 0 0, 10px 10px;
+            }
+
+            100% {
+                background-position: -20px -20px, -10px -10px;
+            }
         }
 
         #reader video,
@@ -272,7 +277,7 @@
             document.getElementById('status').style.color = "#00ff66";
 
             // Beri feedback visual sebelum redirect
-            setTimeout(function() {
+            setTimeout(function () {
                 window.location.href = decodedText;
             }, 300);
         }
@@ -336,18 +341,28 @@
             var html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
                 {
-                    fps: 10,  
-                    // Menghapus batas qrbox agar seluruh layar video ikut ter-scan
-                    // Membatasi format HANYA QR Code agar proses scan jauh lebih cepat dan ringan
-                    formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ],
+                    // Naikkan ke 15 agar transisi frame lebih halus saat mendeteksi fokus
+                    fps: 15,
+
+                    // Batasi format HANYA QR Code agar engine bekerja super ringan
+                    formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+
                     showTorchButtonIfSupported: true,
-                    // Meminta browser menggunakan continuous focus
+
+                    // Pengaturan kamera yang dioptimalkan untuk objek kecil / voucher
                     videoConstraints: {
                         facingMode: "environment",
-                        advanced: [{ focusMode: "continuous" }]
+                        // Meminta resolusi tinggi agar detail QR Code ukuran kecil tetap tajam
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        // Kontrol fokus tingkat lanjut untuk browser yang mendukung
+                        advanced: [
+                            { focusMode: "continuous" },
+                            { pointsOfInterest: { x: 0.5, y: 0.5 } } // Fokus di tengah layar
+                        ]
                     }
                 },
-            /* verbose= */ false
+        /* verbose= */ false
             );
 
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
@@ -355,6 +370,7 @@
             document.getElementById('status').innerText = "Gagal memuat kamera: " + e.message;
             document.getElementById('status').style.color = "red";
         }
+
 
         // ========================================================
         // TRIK MANIPULASI BAHASA INDONESIA SECARA REAL-TIME
