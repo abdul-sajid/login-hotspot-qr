@@ -138,7 +138,14 @@
             }
         }
 
-        #reader video,
+        #reader video {
+            width: 100% !important;
+            max-width: 100% !important;
+            aspect-ratio: 1 / 1 !important; /* Memaksa tampilan video menjadi kotak (persegi) */
+            object-fit: cover !important; /* Memotong otomatis sisi yang berlebih agar proporsional dan tidak gepeng */
+            border-radius: 12px;
+        }
+
         #reader canvas {
             width: 100% !important;
             max-width: 100% !important;
