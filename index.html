@@ -336,18 +336,16 @@
             var html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
                 {
-                    fps: 10,  // Lowering FPS slightly can give the camera more time to focus per frame
-                    qrbox: function(viewfinderWidth, viewfinderHeight) {
-                        var minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-                        // Adaptive QR box size: 85% for larger scanning area at close distance
-                        var qrboxSize = Math.floor(minEdgeSize * 0.85);
-                        return {
-                            width: Math.max(qrboxSize, 250),
-                            height: Math.max(qrboxSize, 250)
-                        };
-                    },
-                    aspectRatio: 1.0,
-                    showTorchButtonIfSupported: true
+                    fps: 10,  
+                    // Menghapus batas qrbox agar seluruh layar video ikut ter-scan
+                    // Membatasi format HANYA QR Code agar proses scan jauh lebih cepat dan ringan
+                    formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ],
+                    showTorchButtonIfSupported: true,
+                    // Meminta browser menggunakan continuous focus
+                    videoConstraints: {
+                        facingMode: "environment",
+                        advanced: [{ focusMode: "continuous" }]
+                    }
                 },
             /* verbose= */ false
             );
@@ -362,19 +360,20 @@
         // TRIK MANIPULASI BAHASA INDONESIA SECARA REAL-TIME
         // ========================================================
         const translateHotspotUI = () => {
-            // 1. Terjemahkan tombol-tombol utama
+            // 1. Tambahkan emoji dan warna pada tombol yang sudah berbahasa Indonesia
             const buttons = document.querySelectorAll("#reader button");
             buttons.forEach(button => {
                 let text = button.innerText.trim().toLowerCase();
-                if (text.includes("request camera permission")) {
+                // Karena library-nya sekarang sudah berbahasa Indonesia, kita sesuaikan kata kuncinya
+                if (text === "izinkan akses kamera") {
                     button.innerText = "Izinkan Akses Kamera 📷";
-                } else if (text.includes("start scanning")) {
+                } else if (text === "mulai kamera") {
                     button.innerText = "Mulai Kamera 🚀";
                     button.style.background = "linear-gradient(135deg, #10b981, #14b8a6)";
-                } else if (text.includes("stop scanning")) {
+                } else if (text === "hentikan kamera") {
                     button.innerText = "Hentikan Kamera ❌";
                     button.style.background = "linear-gradient(135deg, #ef4444, #dc2626)";
-                } else if (text.includes("choose image") || text.includes("choose file")) {
+                } else if (text === "pilih gambar" || text === "pilih file") {
                     button.innerText = "Pilih Gambar Voucher 🖼️";
                     button.style.background = "linear-gradient(135deg, #f59e0b, #d97706)";
                 }
@@ -384,9 +383,9 @@
             const allLinks = document.querySelectorAll("#reader a, #reader span");
             allLinks.forEach(link => {
                 let text = link.innerText.trim();
-                if (text.toLowerCase().includes("scan an image file")) {
+                if (text.toLowerCase() === "scan file gambar") {
                     link.innerText = "📂 Scan Lewat File Gambar/Foto";
-                } else if (text.toLowerCase().includes("scan using camera directly")) {
+                } else if (text.toLowerCase() === "gunakan kamera langsung") {
                     link.innerText = "📷 Gunakan Kamera Secara Langsung";
                 }
             });
