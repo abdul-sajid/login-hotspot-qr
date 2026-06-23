@@ -128,6 +128,11 @@
             animation: scan 2s linear infinite;
         }
 
+        #reader.scanning {
+            animation: none;
+            background-image: none;
+        }
+
         @keyframes scan {
             0% {
                 background-position: 0 0, 10px 10px;
@@ -341,24 +346,30 @@
             var html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
                 {
-                    // Naikkan ke 15 agar transisi frame lebih halus saat mendeteksi fokus
-                    fps: 30,
+                    fps: 15,
 
-                    // Batasi format HANYA QR Code agar engine bekerja super ringan
                     formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
 
                     showTorchButtonIfSupported: true,
 
-                    // Pengaturan kamera yang dioptimalkan untuk objek kecil / voucher
+                    qrbox: function(viewfinderWidth, viewfinderHeight) {
+                        var size = Math.min(viewfinderWidth, viewfinderHeight) * 0.7;
+                        return { width: Math.floor(size), height: Math.floor(size) };
+                    },
+
+                    experimentalFeatures: {
+                        useBarCodeDetectorIfSupported: true
+                    },
+
                     videoConstraints: {
                         facingMode: "environment",
-                        // Meminta resolusi tinggi agar detail QR Code ukuran kecil tetap tajam
+                        aspectRatio: 1,
                         width: { ideal: 1920 },
                         height: { ideal: 1080 },
-                        // Kontrol fokus tingkat lanjut untuk browser yang mendukung
                         advanced: [
                             { focusMode: "continuous" },
-                            { pointsOfInterest: { x: 0.5, y: 0.5 } } // Fokus di tengah layar
+                            { zoom: { ideal: 1.5 } },
+                            { pointsOfInterest: { x: 0.5, y: 0.5 } }
                         ]
                     }
                 },
@@ -410,6 +421,13 @@
             const startButton = Array.from(buttons).find(b => b.innerText.includes("Mulai Kamera"));
             const stopButton = Array.from(buttons).find(b => b.innerText.includes("Hentikan Kamera"));
             const requestButton = Array.from(buttons).find(b => b.innerText.includes("Izinkan Akses Kamera"));
+
+            var readerEl = document.getElementById('reader');
+            if (stopButton) {
+                readerEl.classList.add('scanning');
+            } else {
+                readerEl.classList.remove('scanning');
+            }
 
             if (requestButton) {
                 statusEl.innerText = "Silakan klik 'Izinkan Akses Kamera' untuk memulai.";
